@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import CartaoEvento from "../componentes/CartaoEvento";
 import { AppContexto } from "../contextos/AppContexto";
@@ -42,7 +42,12 @@ export default function TelaEventos({ navigation }) {
   const totalInscricoes = inscricoes.length;
 
   function inscrever(evento) {
-    setInscricoes((listaAtual) => [...listaAtual, evento]);
+    if (inscricoes.some((i) => i.id === evento.id)) return;
+    setInscricoes((listaAtual) =>
+      listaAtual.some((i) => i.id === evento.id)
+        ? listaAtual
+        : [...listaAtual, evento],
+    );
     setEventoSelecionado(evento);
     setEnviado(true);
   }
