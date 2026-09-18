@@ -8,7 +8,7 @@ import {
     View,
 } from "react-native";
 import CartaoEvento from "../componentes/CartaoEvento";
-import { AppContexto } from "../Contextos/AppContexto";
+import { AppContexto } from "../contextos/AppContexto";
 
 export default function TelaEventos({ navigation }) {
   const { temaEscuro } = useContext(AppContexto);
@@ -17,13 +17,11 @@ export default function TelaEventos({ navigation }) {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
   const [enviado, setEnviado] = useState(false);
+  const [eventoSelecionado, setEventoSelecionado] = useState(null);
 
   const [busca, setBusca] = useState("");
-  const [eventosFiltrados, setEventosFiltrados] = useState([]);
 
   const [inscricoes, setInscricoes] = useState([]);
-  const [totalInscricoes, setTotalInscricoes] = useState(0);
-  const [eventoSelecionado, setEventoSelecionado] = useState(null);
 
   useEffect(() => {
     fetch("https://api.campus.iftm.edu.br/eventos")
@@ -37,21 +35,14 @@ export default function TelaEventos({ navigation }) {
       });
   }, []);
 
-  useEffect(() => {
-    setEventosFiltrados(
-      eventos.filter((ev) =>
-        ev.titulo.toLowerCase().includes(busca.toLowerCase()),
-      ),
-    );
-  }, [busca, eventos]);
+  const eventosFiltrados = eventos.filter((ev) =>
+    ev.titulo.toLowerCase().includes(busca.toLowerCase()),
+  );
 
-  useEffect(() => {
-    setTotalInscricoes(inscricoes.length);
-  }, [inscricoes]);
+  const totalInscricoes = inscricoes.length;
 
   function inscrever(evento) {
-    inscricoes.push(evento);
-    setInscricoes(inscricoes);
+    setInscricoes((listaAtual) => [...listaAtual, evento]);
     setEventoSelecionado(evento);
     setEnviado(true);
   }
