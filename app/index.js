@@ -1,34 +1,25 @@
-import { StyleSheet, Text, View } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
+import { AppProvedor } from "../src/contextos/AppContexto";
+import { EventosProvedor } from "../src/contextos/EventosContexto";
+import TelaDetalheEvento from "../src/telas/TelaDetalheEvento";
+import TelaEventos from "../src/telas/TelaEventos";
+import TelaMinhasInscricoes from "../src/telas/TelaMinhasInscricoes";
+
+const Abas = createBottomTabNavigator();
 
 export default function Page() {
   return (
-    <View style={styles.container}>
-      <View style={styles.main}>
-        <Text style={styles.title}>Hello World</Text>
-        <Text style={styles.subtitle}>This is the first page of your app.</Text>
-      </View>
-    </View>
+    <AppProvedor>
+      <EventosProvedor>
+        <NavigationContainer>
+          <Abas.Navigator>
+            <Abas.Screen name="Eventos" component={TelaEventos} />
+            <Abas.Screen name="Detalhe" component={TelaDetalheEvento} />
+            <Abas.Screen name="Inscricoes" component={TelaMinhasInscricoes} />
+          </Abas.Navigator>
+        </NavigationContainer>
+      </EventosProvedor>
+    </AppProvedor>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    padding: 24,
-  },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
-  },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
-  },
-});

@@ -1,7 +1,25 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import { useEventos } from "../contextos/EventosContexto";
+
 export default function TelaDetalheEvento({ route }) {
-  const { evento } = route.params;
+  const { id } = route.params;
+  const { eventos, carregando } = useEventos();
+  const evento = eventos.find((ev) => ev.id === id);
+
+  if (!evento) {
+    return (
+      <View style={styles.container}>
+        {carregando ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <Text style={styles.texto}>
+            Este evento não está mais disponível.
+          </Text>
+        )}
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

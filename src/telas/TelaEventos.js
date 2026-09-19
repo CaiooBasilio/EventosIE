@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -9,46 +9,34 @@ import {
 } from "react-native";
 import CartaoEvento from "../componentes/CartaoEvento";
 import { AppContexto } from "../contextos/AppContexto";
+import { useEventos } from "../contextos/EventosContexto";
 
 export default function TelaEventos({ navigation }) {
   const { temaEscuro } = useContext(AppContexto);
 
-  const [eventos, setEventos] = useState([]);
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState(null);
+  const { eventos, carregando, erro, carregarEventos } = useEventos();
+
   const [enviado, setEnviado] = useState(false);
-  const [eventoSelecionado, setEventoSelecionado] = useState(null);
+
+  const [eventoSelecionadoId, setEventoSelecionadoId] = useState(null);
 
   const [busca, setBusca] = useState("");
 
-  const [inscricoes, setInscricoes] = useState([]);
-
-  useEffect(() => {
-    fetch("https://api.campus.iftm.edu.br/eventos")
-      .then((resposta) => resposta.json())
-      .then((dados) => {
-        setEventos(dados);
-        setCarregando(false);
-      })
-      .catch((e) => {
-        setErro(e.message);
-      });
-  }, []);
+  const [inscricoesIds, setInscricoesIds] = useState([]);
 
   const eventosFiltrados = eventos.filter((ev) =>
     ev.titulo.toLowerCase().includes(busca.toLowerCase()),
   );
+  const totalInscricoes = inscricoesIds.length;
+  const eventoSelecionado = eventos.find((ev) => ev.id === eventoSelecionadoId);
 
-  const totalInscricoes = inscricoes.length;
-
-  function inscrever(evento) {
-    if (inscricoes.some((i) => i.id === evento.id)) return;
-    setInscricoes((listaAtual) =>
-      listaAtual.some((i) => i.id === evento.id)
-        ? listaAtual
-        : [...listaAtual, evento],
+  function inscrever(id) {
+    if (inscricoesIds.includes(id)) return;
+    setInscricoesIds((listaAtual) =>
+      listaAtual.includes(id) ? listaAtual : [...listaAtual, id],
     );
-    setEventoSelecionado(evento);
+
+    setEventoSelecionadoId(id);
     setEnviado(true);
   }
 
@@ -68,7 +56,7 @@ export default function TelaEventos({ navigation }) {
         onChangeText={setBusca}
         placeholder="Buscar evento"
       />
-      {carregando && <ActivityIndicator size="large" />}
+      {carregando && eventos.length === 0 && <ActivityIndicator size="large" />}
       {erro && <Text style={styles.erro}>Falha: {erro}</Text>}
       {enviado && eventoSelecionado && (
         <Text style={styles.aviso}>
@@ -78,11 +66,13 @@ export default function TelaEventos({ navigation }) {
       <FlatList
         data={eventosFiltrados}
         keyExtractor={(itemLista) => String(itemLista.id)}
+        refreshing={carregando}
+        onRefresh={carregarEventos}
         renderItem={({ item }) => (
           <CartaoEvento
             evento={item}
-            aoInscrever={() => inscrever(item)}
-            aoAbrir={() => navigation.navigate("Detalhe", { evento: item })}
+            aoInscrever={() => inscrever(item.id)} // só o id
+            aoAbrir={() => navigation.navigate("Detalhe", { id: item.id })} // só o id
           />
         )}
       />
